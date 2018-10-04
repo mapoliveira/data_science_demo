@@ -7,20 +7,22 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 
 def analyseNames(filenames):
-    path = os.getcwd() + "/namesInUSA"
+    path = os.getcwd() + "/rawData/namesInUSA"
     allfiles = glob2.glob(path + filenames)
     frame = pd.DataFrame()
     list_ = []
     birthPerYear = []
     for file_ in allfiles:
      df = pd.read_csv(file_, delimiter=',', header=None )
-     year = int(re.findall('\d+', file_) [0])
+     year = int(re.findall('\d+', file_) [0]) 
      df['year'] = year 
+     totalNumberBirthPerYear = df[2].sum()
+     df['percPerYear'] = df[2]/totalNumberBirthPerYear*100
      list_.append(df)
      
     # Concatenate all data into one DataFrame
     frame = pd.concat(list_)
-    frame.columns = ['name', 'gender', 'numBirth','year']
+    frame.columns = ['name', 'gender', 'numBirth','year','percPerYear']
     
     def initial(s):
         return(s[0])
@@ -49,9 +51,9 @@ def analyseNames(filenames):
     topNames = birthPerName.head(10)
     print(topNames)
      
-    ax = topNames[['numBirth']].plot(kind='bar')
-    plt.show()
-    plt.savefig("topInitials.png", bbox_inches='tight')   
+    #ax = topNames[['numBirth']].plot(kind='bar')
+    #plt.show()
+    #plt.savefig("topInitials.png", bbox_inches='tight')   
     
     # Calculate number of births 
     #print('Number of births: ' + str(totalNumBirths))
@@ -66,8 +68,11 @@ def analyseNames(filenames):
     #fig.savefig("top5.png", bbox_inches='tight')
     
     # Machine learning for one name across the years ()
-    X = frame[['year']].values
-    y = frame['numBirth'].values
+    searchName = frame[frame['name']=='James']
+    print(searchName)
+
+    X = searchName[['year']].values
+    y = searchName['percPerYear'].values
     # Linear model
     m = LinearRegression()
     m.fit(X,y)
