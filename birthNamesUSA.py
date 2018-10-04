@@ -6,7 +6,33 @@ import re
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 
-def analyseNames(filenames):
+# Machine learning for one name across multiple years
+def searchNameUsage(frame, name2search, gender, method):
+    name = frame[(frame['name'] == name2search) & (frame['gender']==gender)]
+    X = name[['year']].values
+    y = name['percPerYear'].values
+    if method =="linear":
+       # Linear model
+       m = LinearRegression()
+       m.fit(X,y)
+       print(m.coef_)
+       print(m.intercept_)
+       ypred = m.predict(X)
+       fig = plt.figure()
+       plt.plot(X, y, 'bo')
+       plt.plot(X, ypred, 'rx')
+       plt.title("Frequency of " + str(name2search) + " "+ str(gender))
+       fig.savefig("results/linearModel_" + str(name2search) + "_"+ str(gender) +".png")
+       plt.close()
+    else:
+       print('Do polynomial!')
+       #poly = PolynomialFeatures(degree=2)
+       #X_ = poly.fit_transform(X)
+       #predict_ = poly.fit_transform(y)
+
+    return
+# Loading, wrangling and data analysis:
+def analyseNames(filenames, top):
     path = os.getcwd() + "/rawData/namesInUSA"
     allfiles = glob2.glob(path + filenames)
     frame = pd.DataFrame()
@@ -32,23 +58,23 @@ def analyseNames(filenames):
     frame['perc'] = frame['numBirth']/totalNumberBirth*100
     print(totalNumberBirth)
 
-    # Top 10 initials:
+    # Top initials:
     print("\nTop initials:") 
     topInitials = frame.groupby('initial')['numBirth', 'perc'].sum()
     topInitials = topInitials.sort_values(by=['numBirth'], ascending=False)
-    print(topInitials.head(10))
+    print(topInitials.head(top))
 
-    # Top 10 birth years:
+    # Top birth years:
     print("\nTop birth years:")
     birthPerYear = frame.groupby('year')['numBirth', 'perc'].sum()
     birthPerYear = birthPerYear.sort_values(by=['numBirth'], ascending=False)
-    print(birthPerYear.head(10))
+    print(birthPerYear.head(top))
 
-    # Top 10 names:
+    # Top names:
     print("\nTop names:")
     birthPerName = frame.groupby('name')['numBirth', 'perc'].sum()
     birthPerName = birthPerName.sort_values(by=['numBirth'], ascending=False)
-    topNames = birthPerName.head(10)
+    topNames = birthPerName.head(top)
     print(topNames)
      
     #ax = topNames[['numBirth']].plot(kind='bar')
@@ -67,39 +93,18 @@ def analyseNames(filenames):
     #fig = plot.get_figure()
     #fig.savefig("top5.png", bbox_inches='tight')
     
-    # Machine learning for one name across the years ()
-    def searchNameUsage(name, gender):
-        name = frame[(frame['name'] == name) & (frame['gender']==gender)]
-        X = name[['year']].values
-        y = name['percPerYear'].values
-        # Linear model
-        m = LinearRegression()
-        m.fit(X,y)
-        print(m.coef_)
-        print(m.intercept_)
-        ypred = m.predict(X)
-        fig = plt.figure()
-        plt.plot(X, y, 'bo')
-        plt.plot(X, ypred, 'rx')
-        plt.show()
-        fig.savefig("results/linearModel.png")
-        plt.close()
-        return
+    return(frame)
 
-    #Analyse names usage across all years:
+#------ 1986 ------#
+print('1. Baby name analysis in 1986 ----------')
+#analyseNames("/yob1986.txt", 10) 
 
-    searchNameUsage("Michael", "M")
-    searchNameUsage("Michael", "F")
+#------ All years ------# 
+print('2. Baby name analysis across all years ----------')
+analyseNames("/*.txt", 10)
 
-    #poly = PolynomialFeatures(degree=2)
-    #X_ = poly.fit_transform(X)
-    #predict_ = poly.fit_transform(y)
-    return
+# Analyse names usage across all years:
+searchNameUsage("Teresa", "M", "linear")
+searchNameUsage("Teresa", "F", "linear")
 
-   #--1986--#
-#print('----Baby name analysis in 1986----')
-#analyseNames("/yob1986.txt") 
 
-#--All years--#- 
-print('----Baby name analysis across all years----')
-analyseNames("/*.txt")
