@@ -68,27 +68,34 @@ def analyseNames(filenames):
     #fig.savefig("top5.png", bbox_inches='tight')
     
     # Machine learning for one name across the years ()
-    searchName = frame[frame['name']=='James']
-    print(searchName)
+    def searchNameUsage(name, gender):
+        name = frame[(frame['name'] == name) & (frame['gender']==gender)]
+        X = name[['year']].values
+        y = name['percPerYear'].values
+        # Linear model
+        m = LinearRegression()
+        m.fit(X,y)
+        print(m.coef_)
+        print(m.intercept_)
+        ypred = m.predict(X)
+        fig = plt.figure()
+        plt.plot(X, y, 'bo')
+        plt.plot(X, ypred, 'rx')
+        plt.show()
+        fig.savefig("results/linearModel.png")
+        plt.close()
+        return
 
-    X = searchName[['year']].values
-    y = searchName['percPerYear'].values
-    # Linear model
-    m = LinearRegression()
-    m.fit(X,y)
-    print(m.coef_)
-    print(m.intercept_)
-    ypred = m.predict(X)
-    fig = plt.figure()
-    plt.plot(X, y, 'bo')
-    plt.plot(X, ypred, 'rx')
-    plt.show()
-    fig.savefig("linearModel.png")
-   
+    #Analyse names usage across all years:
+
+    searchNameUsage("Michael", "M")
+    searchNameUsage("Michael", "F")
+
     #poly = PolynomialFeatures(degree=2)
     #X_ = poly.fit_transform(X)
     #predict_ = poly.fit_transform(y)
-    
+    return
+
    #--1986--#
 #print('----Baby name analysis in 1986----')
 #analyseNames("/yob1986.txt") 
