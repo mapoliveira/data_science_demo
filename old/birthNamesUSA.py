@@ -6,12 +6,9 @@ import re
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 
-rawData = '.../rawData/namesUSA'
-results = '.../results'
-
 # Loading, wrangling and data analysis:
 def analyseNames(filenames, top):
-    path = os.getcwd() + rawData
+    path = os.getcwd() + "/rawData/namesInUSA"
     allfiles = glob2.glob(path + filenames)
     frame = pd.DataFrame()
     list_ = []
@@ -89,7 +86,7 @@ def searchNameUsage(frame, name2search, gender, method):
        plt.plot(X, y, 'bo')
        plt.plot(X, ypred, 'rx')
        plt.title("Frequency of " + str(name2search) + " "+ str(gender))
-       fig.savefig(results + "/linearModel_" + str(name2search) + "_"+ str(gender) +".png")
+       fig.savefig("results/linearModel_" + str(name2search) + "_"+ str(gender) +".png")
        plt.close()
     else:
        print('Do polynomial!')
