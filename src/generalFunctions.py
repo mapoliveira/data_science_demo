@@ -55,4 +55,52 @@ def bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m):
     print("Cross-validation score (train data): " + str(crossValScoreTrain))
     print("Cross-validation score (all data): " + str(crossValScoreAll))
 
+################ TEST MULTIPLE HYPERPARAMETERS
+
+
+#X, y = load_iris(return_X_y=True)
+#depths = [2, 3, 4, 5]
+#trees = [2, 20, 40, 80, 100]
+####Use GridSearch to loop across multiple parametters ####
+from sklearn.model_selection import GridSearchCV
+
+def testMultipleHyperParameters(X, y, method, n_estimators, depths, scoring, n_jobs, cv):
+    if method == 'RandomForest':
+        print('\n##### RandomForest GridSearch #####')
+        from sklearn.ensemble import RandomForestClassifier
+        m = RandomForestClassifier()
+        grid = GridSearchCV(m,
+                            param_grid = {'n_estimators': n_estimators,
+                            'max_depth': depths},
+                            scoring= scoring,
+                            n_jobs= n_jobs,
+                            cv=cv
+                            )
+        grid.fit(X, y)
+        grid.best_estimator_
+        print('Best parameter (' + method + '): '+ str(grid.best_params_))
+        print('Best score (' + method + '): ' + str(grid.best_score_) )
+
+    elif method == 'LogisticRegression':
+        print('\n##### LogisticRegression GridSearch #####')
+        from sklearn.linear_model import LogisticRegression
+        m = LogisticRegression()
+        grid = GridSearchCV(m,
+                            param_grid = {'C': n_estimators},
+                            scoring= scoring,
+                            n_jobs= n_jobs,
+                            cv=cv
+                            )
+        grid.fit(X, y)
+        grid.best_estimator_
+        print('Best parameter (' + method + '): '+ str(grid.best_params_))
+        print('Best score (' + method + '): ' + str(grid.best_score_))
+
+    else:
+        print('Atention: Select classification method!')
+
+        return grid.best_estimator_, grid.best_params_, grid.best_score_
+   
+
+
 
