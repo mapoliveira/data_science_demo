@@ -84,7 +84,7 @@ def testMultipleHyperParameters(X, y, method, n_estimators, depths, scoring, n_j
     elif method == 'LogisticRegression':
         print('\n##### LogisticRegression GridSearch #####')
         from sklearn.linear_model import LogisticRegression
-        m = LogisticRegression()
+        m = LogisticRegression(solver='lbfgs', max_iter=1000)
         grid = GridSearchCV(m,
                             param_grid = {'C': n_estimators},
                             scoring= scoring,
