@@ -1,4 +1,5 @@
-### Import and define styles
+######################################### Import and define styles
+import pdb
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
@@ -11,13 +12,13 @@ sns.set(style="whitegrid", color_codes=True)
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
 
-### Function to calculate confusion matrix score
+######################################### Function to calculate confusion matrix score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
-def confusionMatrix_analysis(X, y, m)
+def confusionMatrix_analysis(X, y, m):
     ypred = m.predict(X) # calculate ypred using model m
-    confusion_matrix(y, ypred) # show confusion table for both ytest with ypred
+    print(confusion_matrix(y, ypred)) # show confusion table for both ytest with ypred
     """
     top_left (TN); bottom_right (TP); bottom_left (FN); top right (FP)
     TP : surviving passenger correctly predicted
@@ -25,19 +26,21 @@ def confusionMatrix_analysis(X, y, m)
     FP : drowned passenger predicted as surviving
     FN : surviving passenger predicted as drowned
     """
-    print("Precision score: " + str(precison_score(y, ypred))) #Note: ytest first, after the ypred
+    print("Precision score: " + str(precision_score(y, ypred))) #Note: ytest first, after the ypred
     print("Recall score: " + str(recall_score (y, ypred)))
+    #ROC curve
 
-### Function to calculate bootstrapping
+
+######################################### Function to calculate bootstrapping
 from sklearn.utils import resample
-def bootstrapping_analysis(X, y, m)
+def bootstrapping_analysis(X, y, m):
     boots = []
     for i in range(1000):
         Xb, yb = resample(X, y)
         m.fit(Xb, yb)
         score = m.score(Xb, yb)
         boots.append(score)
-        print(i, score)
+        #print(i, score)
 
     # get percentiles for 90% confidence
     boots.sort()
@@ -49,9 +52,24 @@ def bootstrapping_analysis(X, y, m)
     print(f"95% confidence interval: {ci95[0]:5.2} -{ci95[-1]:5.2}")
     ci99 = boots[5:-5]
     print(f"99% confidence interval: {ci99[0]:5.2} -{ci99[-1]:5.2}")
-    
 
-### Read Titanic data
+######################################### Function to calculate bootstrapping
+def bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m):
+    # Bootstrap analysis:
+    bootScoreTrain = bootstrapping_analysis(Xtrain, ytrain, m) # calculate bootstrapping score
+    #bootScoreTest = bootstrapping_analysis(Xtest, ytest, m) # calculate bootstrapping score
+    bootScoreAll = bootstrapping_analysis(X, y, m) # calculate bootstrapping score
+    print("Bootstrap score (train data): " + str(bootScoreTrain))
+    print("Bootstrap score (all data): " + str(bootScoreAll))
+    
+    # Cross-validation analysis:
+    crossValScoreTrain = cross_val_score(X=Xtrain, y=ytrain, estimator=m, cv=5) 
+    #crossValScoreTest = cross_val_score(X=Xtest, y=ytest, estimator=m, cv=5) 
+    crossValScoreAll = cross_val_score(X=X, y=y, estimator=m, cv=5) 
+    print("Cross-validation score (train data): " + str(crossValScoreTrain))
+    print("Cross-validation score (all data): " + str(crossValScoreAll))  
+
+######################################### Read Titanic data:
 print("\n### Titanic dataset ###")
 path = '../rawData/titanic'
 df = pd.read_csv(path + '/train.csv')
@@ -61,7 +79,7 @@ print(list(df.columns))
 numPassengers = df.shape[0] + 1
 print("\nNumber of passengers: " + str(numPassengers))
 
-### Visualise and clean data: ###
+######################################### Visualise and clean data:
 print("\nSurvival count: ")
 print(df['Survived'].value_counts()) #survived (1) or not (0)
 #sns.countplot(x='Survived', data=df)
@@ -71,75 +89,103 @@ print(df['Survived'].value_counts()) #survived (1) or not (0)
 #newDf = df[['Survived','Pclass','Sex','Age', 'SibSp','Parch','Fare','Embarked']]
 #newDf.dropna()
 #print(newDf.loc[:,:])
+#print(df.iloc[:,6:11])
 
-### Feature engineering data: ###
+######################################### Feature engineering data:
 print("Creating boleans categories for each variable...")
 listData = [] #List of data frames
 for i in df.columns:
     if i == 'Survived':
         y = df[i]
-        #print(df[i].dtype)
-    elif i == 'Name' or i == 'Ticket' or i == 'Cabin':
+    elif i == 'Pclass' or i == 'SibSp' or i == 'Parch' or i == 'Embarked':
+        dummies = pd.get_dummies(df[i])
+        labels = list(range(1, dummies.shape[1] + 1))
+        labels = [i + "_" + str(x) for x in labels]
+        dummies.columns = labels
+        listData.append(dummies)
+    elif i == 'Name' or i == 'Ticket':
         print(i)
-    elif df[i].dtype == 'float64':
-        #print(i)
-        dataBins = pd.cut(df[i], bins = 3, labels = [1,2,3])
-        #print(df[i].dtype)
-    else:   
-        #print(df[i].dtype)
+    elif i == 'Age' or i == 'Fare':
+        bins = 4
+        labels = list(range(1, bins + 1))
+        labels = [i + "_" + str(x) for x in labels]
+        dataBins = pd.cut(df[i], bins, labels)
+        print(dataBins)
+    elif i == 'Cabin':
+        print(i)
+    elif i == 'Sex':
         listData.append(pd.get_dummies(df[i]))
+    else:
+        print(i)
 
 newDf = pd.concat(listData, axis=1) # Concatenate data frames
 print(newDf.head(10))
 numCategories = newDf.shape[0]
 print("\nNumber of bolean categories based in all variables (except survival): "+ str(numCategories))
 
-### Split train/test: ###
+######################################### Split train/test:
 print("\n### Has the passenger survived (1) or not (0)? ###")
 # Split dataset into train and test data
 y = df['Survived']
-X = df[df.columns[1 :]]
-
+X = newDf
 from sklearn.model_selection import train_test_split
 Xtrain, Xtest, ytrain, ytest = train_test_split(X, y)
 
-
-### Logistic classification method: 
+######################################### 1. Logistic classification method: 
+print("\n##########Classification method: Logistic regression")
 from sklearn.linear_model import LogisticRegression
-m = LogisticRegression(C=1e10)
-m.fit(Xtrain, ytrain) # train model
-print("\n### Logistic regression method score: " + str(m.score(Xtest, ytest)) + ' ###')
-print("Confusion table analysis:")
-confusionMatrix_analysis(Xtest, ytest, m)
+## Logistic regression model:
+m = LogisticRegression(C=1e5, solver='lbfgs', max_iter=1000)
 
-### Decision tree classification method:
+## Analyse Train/Test data:
+bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
+
+## Fit model and calculate quality:
+m.fit(Xtrain, ytrain) # fit model with the training dataset
+logisticRegressionClassification_score = m.score(Xtrain, ytrain)
+
+print("Logistic regression method score: " + str(m.score(Xtest, ytest)))
+print("Confusion table analysis: ")
+confusionMatrix_analysis(Xtrain, ytrain, m)
+
+######################################### 2. Decision tree classification method:
+print("\n##########Classification method: Decision tree")
 from sklearn.tree import DecisionTreeClassifier
-# Build model
+## Decision tree model:
 m = DecisionTreeClassifier(max_depth=4)
+
+## Analyse Train/Test data:
+bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
+
+## Fit model and calulate quality:
 m.fit(Xtrain, ytrain) # fit the model with the training dataset
-# cross-validation
-decisionTreeClassification_score = m.score(Xtest, ytest) # model quality
+decisionTreeClassification_score = m.score(Xtrain, ytrain) # model quality
+
 print("Decision tree classification method: " + str(decisionTreeClassification_score))
-print("Confusion table analysis:")
-confusionMatrix_analysis(Xtest, ytest, m)
+print("Confusion table analysis: ")
+confusionMatrix_analysis(Xtrain, ytrain, m)
 
-### Random forest classification method:
+## Compare scores in Decision tree model:
+
+######################################### 3. Random forest classification method:
+print("\n##########Classification method: Random forest")
 from sklearn.ensemble import RandomForestClassifier
-
-# Build model
-m = RandomForestClassifier(n_estimators=5, max_depth=2) i
+## RandomForest-based model:
+m = RandomForestClassifier(n_estimators=5, max_depth=2)
 #n_estimators in the number of trees and max_depth is the number of levels in the tree (questions)
 
-crossValScoreTrain = cross_val_score(X=Xtrain, y=ytrain, estimator=m, cv=5) # cross-validation
-crossValScoreTest = cross_val_score(X=Xtest, y=ytest, estimator=m, cv=5) # cross-validation
+## Analyse Train/Test data:
+bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
 
+## Fit model and calculate quality:
 m.fit(Xtrain, ytrain) # fit the model with the training dataset
-randomForestTest_score = m.score(Xtest, ytest) # model quality
+randomForestTest_score = m.score(Xtrain, ytrain) # model quality
 
-#Compare crossValScoreTrain + crossValScoreTest + randomForestTest_score
-print("Randomforest method score: " + str(randomForest_score))
-print("Confusion table analysis:")
-confusionMatrix_analysis(Xtest, ytest, m)
+print("Randomforest method score: " + str(randomForestTest_score))
+print("Confusion table analysis: ")
+confusionMatrix_analysis(Xtrain, ytrain, m)
+
+## Compare scores in RandomForest model:
 
 
 
