@@ -1,28 +1,35 @@
-######################################### Import and define styles
+print('\nComplete pipeline for analysis of titanic dataset:\n')
+
+########## Import packages and define styles ##########
+import pdb # python debugging
 import sys
-sys.path.insert(0, '../src') # identify src directory
-import functionsTitanic # import functions specific to titanic dataset
-import generalFunctions
+sys.path.insert(0, '../src') # Identify src directory
+from functionsTitanic import * # Import functions specific to titanic dataset
+from generalFunctions import * # Import costume made general functions (contains classification functions)
 
-import pdb
-import pandas as pd
+# Import required python packages
 import numpy as np
-from sklearn import preprocessing
+import pandas as pd
 import matplotlib.pyplot as plt 
-plt.rc("font", size=14)
-import seaborn as sns
-sns.set(style="white")
-sns.set(style="whitegrid", color_codes=True)
-## Import classification methods
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_val_score
+#import seaborn as sns
 
-######################################### Read Titanic data:
-print("\n### Titanic dataset ###")
+# Define plot styles
+#plt.rc("font", size=14)
+#sns.set(style="white")
+#sns.set(style="whitegrid", color_codes=True)
+
+# Import classification methods
+#from sklearn import preprocessing
+#from sklearn.linear_model import LogisticRegression
+#from sklearn.model_selection import cross_val_score
+
+########## Read Titanic data ##########
 path = '../rawData/titanic'
 df = pd.read_csv(path + '/train.csv')
 df.set_index('PassengerId', inplace=True)
-print("\nVariables in the dataset:")
+
+print("\nTitanic dataset loaded.")
+print("\nDataset variables:\n")
 print(list(df.columns))
 numPassengers = df.shape[0] + 1
 print("\nNumber of passengers: " + str(numPassengers))
@@ -34,7 +41,6 @@ print(df['Survived'].value_counts()) #survived (1) or not (0)
 #plt.show()
 #plt.savefig('../results/count_plot.png')
 
-from functionsTitanic import featureEngineering
 newDf = featureEngineering(df)
 
 #newDf = df[['Survived','Pclass','Sex','Age', 'SibSp','Parch','Fare','Embarked']]
@@ -47,8 +53,6 @@ numCategories = newDf.shape[0]
 print("\nNumber of bolean categories based in all variables (except survival): "+ str(numCategories))
 
 ######################################### Split train/test:
-from generalFunctions import *
-
 
 print("\n### Has the passenger survived (1) or not (0)? ###")
 # Split dataset into train and test data
