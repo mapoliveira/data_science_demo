@@ -1,7 +1,7 @@
-
 import pandas as pd
 
-######################################### Feature engineering data:
+### Feature engineering data for titanic dataset ###
+
 def featureEngineering(df):
     print("Creating boleans categories for each variable...")
     listData = [] #List of data frames
