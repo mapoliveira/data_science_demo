@@ -99,7 +99,7 @@ def testMultipleHyperParameters(X, y, method, n_estimators, depths, scoring, n_j
     else:
         print('Atention: Select classification method!')
 
-        return grid.best_estimator_, grid.best_params_, grid.best_score_
+        return (grid.best_estimator_, grid.best_params_, grid.best_score_)
    
 
 

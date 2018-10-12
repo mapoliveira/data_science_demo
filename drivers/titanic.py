@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 ########## Read Titanic data ##########
 path = '../rawData/titanic'
-df = pd.read_csv(path + '/train.csv')
+df = pd.read_csv(path + '/all/train.csv')
 df.set_index('PassengerId', inplace=True)
 print("\nTitanic dataset loaded.")
 print("\nDataset variables:")
@@ -42,14 +42,16 @@ print("\nNumber of bolean categories considered (except survival): "+ str(numCat
 # Split dataset into train and test data
 y = df['Survived']
 X = newDf
-from sklearn.model_selection import train_test_split
-Xtrain, Xtest, ytrain, ytest = train_test_split(X, y)
+#from sklearn.model_selection import train_test_split
+#Xtrain, Xtest, ytrain, ytest = train_test_split(X, y)
+Xtrain = X
+ytrain = y
 
 ########## Linear Regression (hyperparameters test)
 n_estimators = [0.1, 1.0, 10.0, 100.0, 1000.0, 100000.0] # trees
 depths = None
 scoring = 'accuracy'
-n_jobs = 2 
+n_jobs = 4 
 cv = 5
 testMultipleHyperParameters(Xtrain, ytrain, 'LogisticRegression', n_estimators, depths, scoring, n_jobs, cv)
 
@@ -65,10 +67,48 @@ testMultipleHyperParameters(Xtrain, ytrain, 'LogisticRegression', n_estimators, 
 n_estimators = [2, 20, 40, 80, 100] # trees
 depths = [2, 3, 4, 5]
 scoring = 'accuracy'
-n_jobs = 2 
+n_jobs = 4 
 cv = 5
+#RFbest_estimator_, RFbest_params_, RFbest_score_ = testMultipleHyperParameters(Xtrain, ytrain, 'RandomForest', n_estimators, depths, scoring, n_jobs, cv)
 testMultipleHyperParameters(Xtrain, ytrain, 'RandomForest', n_estimators, depths, scoring, n_jobs, cv)
 
+##########  Random forest classification method ##########
+print("\n########## Best classification method: Random forest")
+from sklearn.ensemble import RandomForestClassifier
+n_estimators = 80
+#n_estimators = RFbest_params_['n_estimators'] 
+print(n_estimators)
+max_depth = 5
+#max_depth = RFbest_params_['max_depth']
+print(max_depth)
+
+m = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
+#n_estimators in the number of trees and max_depth is the number of levels in the tree (questions)
+
+## Analyse Train/Test data:
+#bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
+
+m.fit(Xtrain, ytrain) # fit the model with the training dataset
+randomForestTest_score = m.score(Xtrain, ytrain) # model quality
+print("\nRandomforest method score: " + str(randomForestTest_score))
+
+##########  Confusion table analysis ##########
+print("\n########## Confusion table analysis: ")
+confusionMatrix_analysis(Xtrain, ytrain, m)
+
+print("\n### Has the passenger survived (1) or not (0)? ###")
+path = '../rawData/titanic'
+pred = pd.read_csv(path + '/predict.csv')
+pred.set_index('PassengerId', inplace=True)
+
+Xpred = featureEngineering(pred)
+
+# Predict
+ypred = m.predict(Xpred)
+
+# format CSV output
+Xpred['Survived'] = ypred
+Xpred.to_csv('result.csv') # submit to kaggle
 
 ########## 1. Logistic classification method ##########
 #print("\n###  Classification method: Logistic regression  ###")
@@ -107,25 +147,4 @@ testMultipleHyperParameters(Xtrain, ytrain, 'RandomForest', n_estimators, depths
 
 ## Compare scores in Decision tree model:
 
-########## 3. Random forest classification method ##########
-print("\n##########Classification method: Random forest")
-from sklearn.ensemble import RandomForestClassifier
-## RandomForest-based model:
-m = RandomForestClassifier(n_estimators=100, max_depth=5)
-#n_estimators in the number of trees and max_depth is the number of levels in the tree (questions)
-
-## Analyse Train/Test data:
-#bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
-
-## Fit model and calculate quality:
-m.fit(Xtrain, ytrain) # fit the model with the training dataset
-randomForestTest_score = m.score(Xtrain, ytrain) # model quality
-
-print("Randomforest method score: " + str(randomForestTest_score))
-print("Confusion table analysis: ")
-confusionMatrix_analysis(Xtrain, ytrain, m)
-
-## Compare scores in RandomForest model:
-
-print("\n### Has the passenger survived (1) or not (0)? ###")
 
