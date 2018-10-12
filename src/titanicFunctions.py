@@ -13,8 +13,11 @@ def featureEngineering(df):
             labels = list(range(1, dummies.shape[1] + 1))
             labels = [i + "_" + str(x) for x in labels]
             dummies.columns = labels
-            listData.append(dummies)
-        elif i == 'Name' or i == 'Ticket':
+            listData.append(dummies.iloc[:, :-1])
+        elif i == 'Name'
+            # Identify titles            
+            print(i)
+        elif i == 'Ticket':
             print(i)
         elif i == 'Age' or i == 'Fare':
             bins = 4
@@ -22,10 +25,13 @@ def featureEngineering(df):
             labels = [i + "_" + str(x) for x in labels]
             dataBins = pd.cut(df[i], bins, labels)
             print(dataBins)
+            dummies = pd.get_dummies(dataBins)
+            listData.append(dummies.iloc[:, :-1])
         elif i == 'Cabin':
             print(i)
         elif i == 'Sex':
-            listData.append(pd.get_dummies(df[i]))
+            dummies = pd.get_dummies(df[i])
+            listData.append(dummies.iloc[:, :-1])
         else:
             print(i)
 

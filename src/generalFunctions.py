@@ -78,7 +78,7 @@ def testMultipleHyperParameters(X, y, method, n_estimators, depths, scoring, n_j
                             )
         grid.fit(X, y)
         grid.best_estimator_
-        print('Best parameter (' + method + '): '+ str(grid.best_params_))
+        print('\nBest parameter (' + method + '): '+ str(grid.best_params_))
         print('Best score (' + method + '): ' + str(grid.best_score_) )
 
     elif method == 'LogisticRegression':
@@ -93,7 +93,7 @@ def testMultipleHyperParameters(X, y, method, n_estimators, depths, scoring, n_j
                             )
         grid.fit(X, y)
         grid.best_estimator_
-        print('Best parameter (' + method + '): '+ str(grid.best_params_))
+        print('\nBest parameter (' + method + '): '+ str(grid.best_params_))
         print('Best score (' + method + '): ' + str(grid.best_score_))
 
     else:

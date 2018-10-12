@@ -4,7 +4,7 @@ print('\n########## Complete pipeline for analysis of titanic dataset: #########
 import pdb # python debugging
 import sys
 sys.path.insert(0, '../src') # Identify src directory
-from functionsTitanic import * # Import functions specific to titanic dataset
+from titanicFunctions import * # Import functions specific to titanic dataset
 from generalFunctions import * # Import costume made general functions (contains classification functions)
 # Import required python packages
 import numpy as np
@@ -71,38 +71,39 @@ testMultipleHyperParameters(Xtrain, ytrain, 'RandomForest', n_estimators, depths
 
 
 ########## 1. Logistic classification method ##########
-print("\n###  Classification method: Logistic regression  ###")
-from sklearn.linear_model import LogisticRegression
+#print("\n###  Classification method: Logistic regression  ###")
+#from sklearn.linear_model import LogisticRegression
 ## Logistic regression model:
-m = LogisticRegression(C=1e5, solver='lbfgs', max_iter=1000)
+#m = LogisticRegression(C=1e5, solver='lbfgs', max_iter=1000)
 
 ## Analyse Train/Test data:
-bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
+#bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
 
 ## Fit model and calculate quality:
-m.fit(Xtrain, ytrain) # fit model with the training dataset
-logisticRegressionClassification_score = m.score(Xtrain, ytrain)
+#m.fit(Xtrain, ytrain) # fit model with the training dataset
+#logisticRegressionClassification_score = m.score(Xtrain, ytrain)
 
-print("Logistic regression method score: " + str(m.score(Xtest, ytest)))
-print("Confusion table analysis: ")
-confusionMatrix_analysis(Xtrain, ytrain, m)
+#print("Logistic regression method score: " + str(m.score(Xtest, ytest)))
+
+#print("Confusion table analysis: ")
+#confusionMatrix_analysis(Xtrain, ytrain, m)
 
 ########## 2. Decision tree classification method ##########
-print("\n##########Classification method: Decision tree")
-from sklearn.tree import DecisionTreeClassifier
+#print("\n##########Classification method: Decision tree")
+#from sklearn.tree import DecisionTreeClassifier
 ## Decision tree model:
-m = DecisionTreeClassifier(max_depth=4)
+#m = DecisionTreeClassifier(max_depth=4)
 
 ## Analyse Train/Test data:
-bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
+#bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
 
 ## Fit model and calulate quality:
-m.fit(Xtrain, ytrain) # fit the model with the training dataset
-decisionTreeClassification_score = m.score(Xtrain, ytrain) # model quality
+#m.fit(Xtrain, ytrain) # fit the model with the training dataset
+#decisionTreeClassification_score = m.score(Xtrain, ytrain) # model quality
 
-print("Decision tree classification method: " + str(decisionTreeClassification_score))
-print("Confusion table analysis: ")
-confusionMatrix_analysis(Xtrain, ytrain, m)
+#print("Decision tree classification method: " + str(decisionTreeClassification_score))
+#print("Confusion table analysis: ")
+#confusionMatrix_analysis(Xtrain, ytrain, m)
 
 ## Compare scores in Decision tree model:
 
@@ -110,11 +111,11 @@ confusionMatrix_analysis(Xtrain, ytrain, m)
 print("\n##########Classification method: Random forest")
 from sklearn.ensemble import RandomForestClassifier
 ## RandomForest-based model:
-m = RandomForestClassifier(n_estimators=5, max_depth=2)
+m = RandomForestClassifier(n_estimators=100, max_depth=5)
 #n_estimators in the number of trees and max_depth is the number of levels in the tree (questions)
 
 ## Analyse Train/Test data:
-bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
+#bootCrossVal_analysis(Xtrain, Xtest, X, ytrain, ytest, y, m)
 
 ## Fit model and calculate quality:
 m.fit(Xtrain, ytrain) # fit the model with the training dataset
