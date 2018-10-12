@@ -38,6 +38,7 @@ def featureEngineering(df):
             passengers = df[i]
             title = []
             name = []
+            index = df.index
             for p in passengers:
                 t = re.search(', (.*)\.', p)
                 title.append(t.group(1))
@@ -45,12 +46,12 @@ def featureEngineering(df):
                 n = re.search('(.*),', p)
                 name.append(n.group(1))
                 
-            title = pd.Series(title, index=range(1, len(title)+1)) 
+            title = pd.Series(title, index = index) 
             dummiesTitle = pd.get_dummies(title)
             print(dummiesTitle.isna().any())
             listData.append(dummiesTitle.iloc[:, :-1])
             
-            name = pd.Series(name, index=range(1, len(name)+1)) 
+            name = pd.Series(name, index = index) #range(1, len(name)+1)) 
             dummiesName = pd.get_dummies(name)
             print(dummiesName.isna().any())
             listData.append(dummiesName.iloc[:, :-1])
@@ -72,6 +73,8 @@ def featureEngineering(df):
             print(i + ' data was not considered')
     print('here')
     newDf = pd.concat(listData, axis=1) # Concatenate data frames
+    print(listData)
+    print(newDf)
     print(newDf.isna().any())
     #assert (newDf.isna().any() == False), 'There are NaN values in the dummies!'
     

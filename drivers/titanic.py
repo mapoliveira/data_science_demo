@@ -98,9 +98,9 @@ confusionMatrix_analysis(Xtrain, ytrain, m)
 
 print("\n### Has the passenger survived (1) or not (0)? ###")
 path = '../rawData/titanic'
-pred = pd.read_csv(path + '/predict.csv')
+pred = pd.read_csv(path + '/all/test.csv')
 pred.set_index('PassengerId', inplace=True)
-
+print(pred)
 Xpred = featureEngineering(pred)
 
 # Predict
