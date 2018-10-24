@@ -1,4 +1,5 @@
 # Portfolio Data Science
+Collection of example tutorials to analyse cross-sectional and time-series datasets
 
 ## Example studies
 
