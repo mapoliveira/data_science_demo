@@ -1,4 +1,8 @@
-# Data Science demo
+# Portfolio Data Science
+
+## Example studies
+
+![Alt text](figures/figure1.png?raw=true "figure1")
 
 ## Installation
 
