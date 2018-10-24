@@ -2,6 +2,8 @@ import requests
 import re
 import time
 
+path = '../results/lyricsAnalysis'
+
 def getSongs4Artists(listOfArtists):
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     songs4Artists = {}
@@ -28,6 +30,7 @@ def getSongs4Artists(listOfArtists):
     return songs4Artists
     
 def getLyrics4Artists(songs4Artists):
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
     lyrics4Artists = {}
     for artist in songs4Artists:
         listLyrics = [] 
@@ -44,26 +47,39 @@ def getLyrics4Artists(songs4Artists):
                 lyrics = re.sub(r'<br>\\n', " ", str(lyrics))
                 lyrics = re.sub(r'<\/p><p class=\'verse\'>', " ", str(lyrics))
                 listLyrics.append(lyrics)
+                
                 # Save song lyrics in a file
                 filename = re.sub('-', '', artist) + '_' + re.sub('-', '', songName) + '.txt'
-                f = open(filename, 'w')
+                f = open(path + filename, 'w')
                 f.write(lyrics)
                 f.close()
-                f = open(filename, 'r')
+                f = open(path + filename, 'r')
                 text = f.read()
+
         concatLyrics4Artist.append(concatenate_list_data(listLyrics))
         lyrics4Artists[artist] = concatLyrics4Artist
-        words4Artist = getWords(concatLyrics4Artist)         
-    return words4Artist, lyrics4Artists
+    return lyrics4Artists
 
-def getWords(lyrics4Artists):
-    print(lyrics4Artists)
-    tokens = re.sub("\.|\,|\?|\n", "", str(lyrics4Artists))
-    tokens = lyrics4Artists.split()
-    return tokens
+def featureExtraction4Lyrics(lyrics4Artists):
+    lables = lyrics4Artists
+    cv = CountVectorizer()
+    vec = cv.fit_transform(lyrics4Artists)
+    
+    tf = TfidfTransformer()
+    vec2 = tf.fit_transform(vec) # normalise the vec data
+    return vec2
+
+def getNaiveBayesModel(X,y):
+    from sklearn.naive_bayes import MultinomialNB
+    m = MultinomialNB()
+    m.fit(X,y)
+    m.score(X,y)
+    return m
 
 def concatenate_list_data(listSongs):
     result= ''
     for element in listSongs:
         result += str(element)
     return result
+
+
