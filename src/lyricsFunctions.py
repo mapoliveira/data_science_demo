@@ -34,18 +34,18 @@ def getLyrics4Artists(songs4Artists):
     lyrics4Artists = {}
     for artist in songs4Artists:
         listLyrics = [] 
-        concatLyrics4Artist = []
-        allWords4Artist = []
         for i,songName in enumerate(songs4Artists[artist]):
-            if i<2:
+            if i<20:
                 url = 'http://www.metrolyrics.com/' + songName + '-lyrics-' + artist +'.html'
                 print(url)
                 time.sleep(30)
                 page = requests.get(url, headers=headers)
                 htmlSong = page.text
                 lyrics = re.findall('''<p class='verse'>(\D+)<\/p>''', htmlSong)
-                lyrics = re.sub(r'<br>\\n', " ", str(lyrics))
-                lyrics = re.sub(r'<\/p><p class=\'verse\'>', " ", str(lyrics))
+                lyrics = str(lyrics).strip('[]')
+                lyrics = re.sub(r'<br>\\n', " ", lyrics)
+                lyrics = re.sub(r'\"', "", lyrics)
+                lyrics = re.sub(r'<\/p><p class=\'verse\'>', " ", lyrics)
                 listLyrics.append(lyrics)
                 
                 # Save song lyrics in a file
@@ -56,32 +56,57 @@ def getLyrics4Artists(songs4Artists):
                 f = open(path + filename, 'r')
                 text = f.read()
 
-        concatLyrics4Artist.append(concatenate_list_data(listLyrics))
-        lyrics4Artists[artist] = concatLyrics4Artist
+        lyrics4Artists[artist] = listLyrics
+    #print(lyrics4Artists)
     return lyrics4Artists
 
 def buildNaiveBayesModel(lyrics4Artists):
-    labels = list(lyrics4Artists.keys())
-    
+    labels = []
+    lyrics = []
+    for artist in lyrics4Artists.keys():
+        for song in lyrics4Artists[artist]:
+            labels.append(artist)
+            lyrics.append(song)
+
     # tokenize + count bag of words
     from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
     cv = CountVectorizer()
-    vec = cv.fit_transform(lyrics4Artists)
+    vec = cv.fit_transform(lyrics)
     # apply Tf-Idf
     tf = TfidfTransformer()
     X = tf.fit_transform(vec) # normalise the vec data
-    
+
     # build Naive Bayes model
     from sklearn.naive_bayes import MultinomialNB
     m = MultinomialNB()
     m.fit(X,labels)
     m.score(X,labels)
-    return m
+    return m, cv, tf
 
-def concatenate_list_data(listSongs):
-    result= ''
-    for element in listSongs:
-        result += str(element)
-    return result
+def proba_Lyrics4Artists(test_songs, m, cv, tf):
+
+    # vectorize + tfidf first
+    test_vec = cv.transform(test_songs)
+    test_vec2 = tf.transform(test_vec)
+
+    # prediction results
+    prediction = m.predict(test_vec2)
+    print('\n Test songs might belong to:')
+    print(prediction)
+
+    # class probabilities
+    classProb = m.predict_proba(test_vec2)
+    print('\n Each song probability from being from each artist:')
+    print(classProb)
+
+    logProb = m.feature_log_prob_
+    print(logProb)
+    return prediction, classProb, logProb
+
+#def concatenate_list_data(listSongs):
+#    result= ''
+#    for element in listSongs:
+#        result += str(element)
+#    return result
 
 
