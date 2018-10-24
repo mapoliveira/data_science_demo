@@ -60,20 +60,22 @@ def getLyrics4Artists(songs4Artists):
         lyrics4Artists[artist] = concatLyrics4Artist
     return lyrics4Artists
 
-def featureExtraction4Lyrics(lyrics4Artists):
-    lables = lyrics4Artists
+def buildNaiveBayesModel(lyrics4Artists):
+    labels = list(lyrics4Artists.keys())
+    
+    # tokenize + count bag of words
+    from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
     cv = CountVectorizer()
     vec = cv.fit_transform(lyrics4Artists)
-    
+    # apply Tf-Idf
     tf = TfidfTransformer()
-    vec2 = tf.fit_transform(vec) # normalise the vec data
-    return vec2
-
-def getNaiveBayesModel(X,y):
+    X = tf.fit_transform(vec) # normalise the vec data
+    
+    # build Naive Bayes model
     from sklearn.naive_bayes import MultinomialNB
     m = MultinomialNB()
-    m.fit(X,y)
-    m.score(X,y)
+    m.fit(X,labels)
+    m.score(X,labels)
     return m
 
 def concatenate_list_data(listSongs):
