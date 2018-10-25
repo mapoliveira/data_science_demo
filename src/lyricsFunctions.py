@@ -4,15 +4,16 @@ import time
 
 path = '../results/lyricsAnalysis'
 
-def getSongs4Artists(listOfArtists, location):
+def getSongs4Artists(listOfArtists, location = 'online'):
     if location == 'online':
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
         songs4Artists = {}
         for artist in listOfArtists:
             artist = artist.lower()
             artist = re.sub(' ', '-', artist)
-            url = 'http://www.metrolyrics.com/' + artist + '-lyrics.html'
-            #print(url)
+            url = 'http://www.metrolyrics.com/' + artist + '-lyrics.html' 
+            print("Fetching " + artist + ' songs online ...')
+            print(url)
             time.sleep(30)
             page = requests.get(url, headers=headers)
             html = page.text
@@ -27,15 +28,16 @@ def getSongs4Artists(listOfArtists, location):
             songNames = []
             for i,j in enumerate(songs): 
                 songNames.append(re.sub("-", " ", songs[i]))
-        print(artist + ' songs: '+ str(songNames))
-     
+            #print(artist + ' songs: '+ str(songNames))
+        print('Done!')
+
     elif location == 'local':
         print('TODO: create songs4artists from local database')
     
     return songs4Artists
     
-def getLyrics4Artists(songs4Artists, numSongs, location):
-    if location == 'online'
+def getLyrics4Artists(songs4Artists, numSongs = 5, location = 'online'):
+    if location == 'online':
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
         lyrics4Artists = {}
         for artist in songs4Artists:
@@ -51,6 +53,7 @@ def getLyrics4Artists(songs4Artists, numSongs, location):
                     lyrics = re.findall('''<p class='verse'>(\D+)<\/p>''', htmlSong)
                     lyrics = " ".join(lyrics) # concatenates all verses in one string
                     lyrics = re.sub(r'<br>\\n', " ", lyrics)
+                    lyrics = re.sub(r'<br>', " ", lyrics)
                     lyrics = re.sub(r'\"', "", lyrics)
                     lyrics = re.sub(r'<\/p><p class=\'verse\'>', " ", lyrics)
                     listLyrics.append(lyrics)
