@@ -4,60 +4,72 @@ import time
 
 path = '../results/lyricsAnalysis'
 
-def getSongs4Artists(listOfArtists):
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-    songs4Artists = {}
-    for artist in listOfArtists:
-        artist = artist.lower()
-        artist = re.sub(' ', '-', artist)
-        url = 'http://www.metrolyrics.com/' + artist + '-lyrics.html'
-        print("\n" + url)
-        time.sleep(30)
-        page = requests.get(url, headers=headers)
-        html = page.text
+def getSongs4Artists(listOfArtists, location):
+    if location == 'online':
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        songs4Artists = {}
+        for artist in listOfArtists:
+            artist = artist.lower()
+            artist = re.sub(' ', '-', artist)
+            url = 'http://www.metrolyrics.com/' + artist + '-lyrics.html'
+            #print(url)
+            time.sleep(30)
+            page = requests.get(url, headers=headers)
+            html = page.text
         
-        # Get all musics for each artist
-        pattern = '''metrolyrics\.com\/(\w.+)-lyrics-''' + artist + '''\.html'''
-        songs = re.findall(pattern, html)
-        songs4Artists[artist] = songs
-        #print(songs4Artists)
+            # Get all musics for each artist
+            pattern = '''metrolyrics\.com\/(\w.+)-lyrics-''' + artist + '''\.html'''
+            songs = re.findall(pattern, html)
+            songs4Artists[artist] = songs
+            #print(songs4Artists)
         
-        # Print all songs for each artist
-        songNames = []
-        for i,j in enumerate(songs): 
-            songNames.append(re.sub("-", " ", songs[i]))
+            # Print all songs for each artist
+            songNames = []
+            for i,j in enumerate(songs): 
+                songNames.append(re.sub("-", " ", songs[i]))
         print(artist + ' songs: '+ str(songNames))
+     
+    elif location == 'local':
+        print('TODO: create songs4artists from local database')
+    
     return songs4Artists
     
-def getLyrics4Artists(songs4Artists):
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-    lyrics4Artists = {}
-    for artist in songs4Artists:
-        listLyrics = [] 
-        for i,songName in enumerate(songs4Artists[artist]):
-            if i<20:
-                url = 'http://www.metrolyrics.com/' + songName + '-lyrics-' + artist +'.html'
-                print(url)
-                time.sleep(30)
-                page = requests.get(url, headers=headers)
-                htmlSong = page.text
-                lyrics = re.findall('''<p class='verse'>(\D+)<\/p>''', htmlSong)
-                lyrics = str(lyrics).strip('[]')
-                lyrics = re.sub(r'<br>\\n', " ", lyrics)
-                lyrics = re.sub(r'\"', "", lyrics)
-                lyrics = re.sub(r'<\/p><p class=\'verse\'>', " ", lyrics)
-                listLyrics.append(lyrics)
+def getLyrics4Artists(songs4Artists, numSongs, location):
+    if location == 'online'
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        lyrics4Artists = {}
+        for artist in songs4Artists:
+            print("Fetching " + str(numSongs) + ' lyrics for ' + artist + ' ...')
+            listLyrics = [] 
+            for i,songName in enumerate(songs4Artists[artist]):
+                if i<numSongs:
+                    url = 'http://www.metrolyrics.com/' + songName + '-lyrics-' + artist +'.html'
+                    #print(url)
+                    time.sleep(30)
+                    page = requests.get(url, headers=headers)
+                    htmlSong = page.text
+                    lyrics = re.findall('''<p class='verse'>(\D+)<\/p>''', htmlSong)
+                    lyrics = " ".join(lyrics) # concatenates all verses in one string
+                    lyrics = re.sub(r'<br>\\n', " ", lyrics)
+                    lyrics = re.sub(r'\"', "", lyrics)
+                    lyrics = re.sub(r'<\/p><p class=\'verse\'>', " ", lyrics)
+                    listLyrics.append(lyrics)
                 
-                # Save song lyrics in a file
-                filename = re.sub('-', '', artist) + '_' + re.sub('-', '', songName) + '.txt'
-                f = open(path + filesep + filename, 'w')
-                f.write(lyrics)
-                f.close()
-                f = open(path + filesep + filename, 'r')
-                text = f.read()
+                    # Save song lyrics in a file
+                    filename = re.sub('-', '', artist) + '_' + re.sub('-', '', songName) + '.txt'
+                    f = open(path + '/' + filename, 'w')
+                    f.write(lyrics)
+                    f.close()
+                    f = open(path + '/' + filename, 'r')
+                    text = f.read()
 
-        lyrics4Artists[artist] = listLyrics
-    #print(lyrics4Artists)
+            lyrics4Artists[artist] = listLyrics
+        #print(lyrics4Artists)
+        print('Done!')
+    
+    elif location == 'local':
+        print('TODO: create lyrics4Artist from local database')
+    
     return lyrics4Artists
 
 def buildNaiveBayesModel(lyrics4Artists):
