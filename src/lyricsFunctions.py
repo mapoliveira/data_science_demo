@@ -50,10 +50,10 @@ def getLyrics4Artists(songs4Artists):
                 
                 # Save song lyrics in a file
                 filename = re.sub('-', '', artist) + '_' + re.sub('-', '', songName) + '.txt'
-                f = open(path + filename, 'w')
+                f = open(path + filesep + filename, 'w')
                 f.write(lyrics)
                 f.close()
-                f = open(path + filename, 'r')
+                f = open(path + filesep + filename, 'r')
                 text = f.read()
 
         lyrics4Artists[artist] = listLyrics
