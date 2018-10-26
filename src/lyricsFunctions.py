@@ -85,7 +85,7 @@ def buildNaiveBayesModel(lyrics4Artists):
 
     # tokenize + count bag of words
     from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-    cv = CountVectorizer()
+    cv = CountVectorizer(stop_words='english', min_df = 10 )
     vec = cv.fit_transform(lyrics)
     # apply Tf-Idf
     tf = TfidfTransformer()
@@ -96,7 +96,21 @@ def buildNaiveBayesModel(lyrics4Artists):
     m = MultinomialNB()
     m.fit(X,labels)
     m.score(X,labels)
-    return m, cv, tf
+    return m, cv, tf, X
+    
+    #### Latent Dirichlet Allocation
+
+    #lda = LatentDirichletAllocation(n_components=3)
+    #lda.fit(vec)
+    #c = lda.components_
+    #words = list(sorted(cv.vocabulary_.keys()))
+
+    #ctrans = c.T
+
+    #df = pd.DataFrame(ctrans, index=words)
+
+    #for i in range(10):
+    #    print(df[i].sort_values(ascending=False).head(20))
 
 def proba_Lyrics4Artists(test_songs, m, cv, tf):
 
