@@ -1,8 +1,8 @@
 #### Function to plot timeseries using plotly ####
 
-import plotly
+import plotly as py
 
-def plotlyTimeSeries(datetimeX, listData, browserOutput=True):
+def plotlyTimeSeries(datetimeX, listData, filename):
     import plotly.graph_objs as go
     dataPanda = []
     
@@ -17,11 +17,11 @@ def plotlyTimeSeries(datetimeX, listData, browserOutput=True):
     # Plot data:
     fig = dict(data=dataPanda)
     
-    if browserOutput == True: 
-        plotly.offline.plot(fig)
+    if filename == '':
+        py.offline.plot(fig)
         print('Find interactive graphic in the browser.')
     else:
         print('jupiter notebook output')
-        #plotly.iplot(fig)
+        #py.iplot(fig, filename)
 
        
