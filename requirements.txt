@@ -1,8 +1,8 @@
 pandas
+numpy
 matplotlib
-os
-glob2
-re
-sklearn.linear_model
-sklearn.preprocessing
-
+sklearn
+jupyter
+seaborn
+wordcloud
+scipy
