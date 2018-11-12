@@ -6,3 +6,5 @@ jupyter
 seaborn
 wordcloud
 scipy
+requests
+plotly
