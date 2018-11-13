@@ -1,5 +1,6 @@
 pandas
 numpy
+datetime
 matplotlib
 sklearn
 jupyter
