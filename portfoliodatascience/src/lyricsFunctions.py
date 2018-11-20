@@ -1,6 +1,7 @@
 import requests
 import re
 import time
+import numpy as np
 
 path = '../results/lyricsAnalysis'
 
@@ -75,29 +76,46 @@ def getLyrics4Artists(songs4Artists, numSongs = 5, location = 'online'):
     
     return lyrics4Artists
 
-def buildNaiveBayesModel(lyrics4Artists):
+def tokenLyrics4Artists(lyrics4Artists, method='countVectorize'):
+    #print(lyrics4Artists)
     labels = []
     lyrics = []
     for artist in lyrics4Artists.keys():
         for song in lyrics4Artists[artist]:
             labels.append(artist)
             lyrics.append(song)
+            
+    if method == 'spacy':
+        import spacy
+        try:
+            # Load English tokenizer, tagger, parser, NER and word vectors
+            nlp = spacy.load('en_core_web_sm')
+        except:
+            import os
+            os.system("python -m spacy download en_core_web_lg")
+            nlp = spacy.load('en_core_web_sm')
 
-    # tokenize + count bag of words
-    from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-    cv = CountVectorizer(stop_words='english', min_df = 10 )
-    vec = cv.fit_transform(lyrics)
-    # apply Tf-Idf
-    tf = TfidfTransformer()
-    X = tf.fit_transform(vec) # normalise the vec data
+        doc = nlp(lyrics)
+    
+    elif method == 'countVectorize':
+        # tokenize + count words + Tfid normalization
+        from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+        cv = CountVectorizer(stop_words='english', min_df = 10 )
+        #print(lyrics)
+        vec = cv.fit_transform(lyrics)
+        #print(vec)
+    
+        tf = TfidfTransformer()
+        X = tf.fit_transform(vec) # normalise the vec data
+        return X, cv, vec, tf, labels, lyrics
 
-    # build Naive Bayes model
+def buildNaiveBayesModel(X, labels):
     from sklearn.naive_bayes import MultinomialNB
     m = MultinomialNB()
     m.fit(X,labels)
     m.score(X,labels)
-    return m, cv, tf, X
-    
+    return m
+
     #### Latent Dirichlet Allocation
 
     #lda = LatentDirichletAllocation(n_components=3)
@@ -132,10 +150,19 @@ def proba_Lyrics4Artists(test_songs, m, cv, tf):
     print(logProb)
     return prediction, classProb, logProb
 
-#def concatenate_list_data(listSongs):
-#    result= ''
-#    for element in listSongs:
-#        result += str(element)
-#    return result
+def cosine_similarity(a, b):
+    """Returns cosine similarity of two word vectors"""
+    return np.linalg.norm(a.dot(b) / (np.linalg.norm(a) * np.linalg.norm(b)))
 
-
+def analysis_gensimModels(artistLyrics, word1, word2, word3):
+    from gensim.models import word2vec
+    import numpy as np
+    tokenized = [s.lower().split() for s in artistLyrics]
+    wv = word2vec.Word2Vec(tokenized, size=7, window=5, min_count=1)
+    #most similar word in the corpus for this word
+    cs_12 = cosine_similarity(wv.wv[word1], wv.wv[word2])
+    cs_13 = cosine_similarity(wv.wv[word1], wv.wv[word3])
+    print('Distance between: ')
+    print('love and right ' + str(cs_12))
+    print('love and wrong ' + str(cs_13))
+    print('\nDifference between right and wrong: ' + str(round((cs_12-cs_13)*100, 2)) + '%')
