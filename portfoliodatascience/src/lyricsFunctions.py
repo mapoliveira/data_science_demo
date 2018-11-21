@@ -156,7 +156,8 @@ def wordcloud4Artist(lyrics4Artists, artist):
     import matplotlib.pyplot as plt
     plt.figure(num = None, figsize = (20,20))
     
-    wordcloud1 = wordcloud.WordCloud(background_color="white", max_words=2000, contour_color='steelblue').generate(allWords4Artist)
+    wordcloud1 = wordcloud.WordCloud(background_color="white", max_words=2000, 
+            collocations=False, contour_color='steelblue').generate(allWords4Artist)
     plt.subplot(3,1,1)
     plt.title(artist, fontsize=18, loc='right')
     plt.imshow(wordcloud1, interpolation='bilinear')
