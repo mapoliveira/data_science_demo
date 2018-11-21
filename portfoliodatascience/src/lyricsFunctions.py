@@ -112,8 +112,8 @@ def tokenLyrics4Artists(lyrics4Artists, method='countVectorize'):
 def buildNaiveBayesModel(X, labels):
     from sklearn.naive_bayes import MultinomialNB
     m = MultinomialNB()
-    m.fit(X,labels)
-    m.score(X,labels)
+    m.fit(X, labels)
+    m.score(X, labels)
     return m
 
     #### Latent Dirichlet Allocation
@@ -149,6 +149,18 @@ def proba_Lyrics4Artists(test_songs, m, cv, tf):
     logProb = m.feature_log_prob_
     print(logProb)
     return prediction, classProb, logProb
+
+def wordcloud4Artist(lyrics4Artists, artist):
+    allWords4Artist = " ".join(lyrics4Artists[artist])
+    import wordcloud
+    import matplotlib.pyplot as plt
+    plt.figure(num = None, figsize = (20,20))
+    
+    wordcloud1 = wordcloud.WordCloud(background_color="white", max_words=2000, contour_color='steelblue').generate(allWords4Artist)
+    plt.subplot(3,1,1)
+    plt.title(artist, fontsize=18, loc='right')
+    plt.imshow(wordcloud1, interpolation='bilinear')
+    plt.show()
 
 def cosine_similarity(a, b):
     """Returns cosine similarity of two word vectors"""
