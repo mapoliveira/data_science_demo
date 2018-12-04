@@ -10,4 +10,5 @@ scipy
 requests
 plotly
 gensim
+pylint
 spacy
