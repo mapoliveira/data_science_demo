@@ -7,6 +7,7 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install pylint
+  - pip install tox
   # - pip install --editable .
 # command to run tests
 script:
