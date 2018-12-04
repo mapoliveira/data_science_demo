@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/mapoliveira/portfoliodatascience.svg?branch=master)](https://travis-ci.org/mapoliveira/portfolioDataScience)
+[![Build Status](https://travis-ci.org/mapoliveira/portfolioDataScience.svg?branch=master)](https://travis-ci.org/mapoliveira/portfolioDataScience)
+
 # Portfolio Data Science
 Collection of example tutorials to analyse cross-sectional and time-series datasets
 
